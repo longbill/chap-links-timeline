@@ -31,11 +31,12 @@ browser.
 
 
 ##IMPROVEMENTS##
-Make the chart horizonally resizable.
-Add a built-in "line" chart type. It is draggable in editable mode.
-Confirm on delete.
-Draw chart from JSON data support, JSON data export support.
-Many other small improvements.
+
+- Make the chart horizonally resizable.
+- Add a built-in "line" chart type. It is draggable in editable mode.
+- Confirm on delete.
+- Draw chart from JSON data support, JSON data export support.
+- Many other small improvements.
 
 
 ##DOCUMENTATION##
