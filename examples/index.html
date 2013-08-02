@@ -1,0 +1,231 @@
+<html >
+<head>
+    <title>Timeline Group Demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="../timeline.js"></script>
+    <link rel="stylesheet" type="text/css" href="../timeline.css">
+
+    <style type="text/css">
+
+        body {font: 10pt arial;}
+
+    </style>
+
+
+    <script type="text/javascript">
+        var timeline = null;
+        var jsonData = 
+        [{
+            "start": "Date(2013, 6, 30, 18, 48, 33, 774)",
+            "end": "Date(2013, 6, 30, 22, 48, 33, 774)",
+            "content": "",
+            "group": "group1",
+            "type": "range"
+        }, {
+            "start": "Date(2013, 6, 30, 23, 48, 33, 774)",
+            "end": "Date(2013, 6, 31, 1, 48, 33, 774)",
+            "content": "",
+            "group": "group2",
+            "type": "range"
+        }, {
+            "start": "Date(2013, 6, 31, 2, 48, 33, 774)",
+            "end": "Date(2013, 6, 31, 5, 48, 33, 774)",
+            "content": "",
+            "group": "group2",
+            "type": "range"
+        }, {
+            "start": "Date(2013, 6, 31, 6, 48, 33, 774)",
+            "end": "Date(2013, 6, 31, 9, 48, 33, 774)",
+            "content": "",
+            "group": "group2",
+            "type": "range"
+        }, {
+            "start": "Date(2013, 6, 30, 19, 48, 33, 775)",
+            "end": "Date(2013, 6, 30, 23, 48, 33, 775)",
+            "content": "",
+            "group": "group3",
+            "type": "range"
+        }, {
+            "start": "Date(2013, 6, 31, 4, 48, 33, 775)",
+            "end": "Date(2013, 6, 31, 6, 48, 33, 775)",
+            "content": "",
+            "group": "group3",
+            "type": "range"
+        }, {
+            "start": "Date(2013, 6, 31, 8, 0, 0)",
+            "end": "Date(2013, 6, 31, 10, 0, 0)",
+            "content": "",
+            "group": "group4",
+            "type": "range"
+        }, {
+            "start": "Date(2013, 6, 31, 10, 48, 33, 775)",
+            "end": "Date(2013, 6, 31, 13, 48, 33, 775)",
+            "content": "",
+            "group": "group4",
+            "type": "range"
+        }, {
+            "start": "Date(2013, 6, 31, 14, 48, 33, 775)",
+            "end": "Date(2013, 6, 31, 17, 48, 33, 775)",
+            "content": "",
+            "group": "group4",
+            "type": "range"
+        }, {
+            "start": "Date(2013, 6, 30, 15, 48, 33, 776)",
+            "end": "Date(2013, 6, 30, 20, 48, 33, 776)",
+            "content": "",
+            "group": "group4",
+            "type": "range"
+        }, {
+            "start": "Date(2013, 6, 30, 21, 48, 33, 776)",
+            "end": "Date(2013, 6, 30, 23, 48, 33, 776)",
+            "content": "",
+            "group": "group4",
+            "type": "range"
+        },
+        {
+            "start": "Date(2013, 6, 30, 21, 48, 33, 776)",
+            "end": "Date(2013, 6, 30, 23, 48, 33, 776)",
+            "content": "Deadline 1",
+            "group": "group4",
+            "type": "line"
+        }];
+
+        var groupText = 
+        {
+            "group1" : '<img src="img/truck-icon.png" style="width:24px; height:24px; vertical-align: middle">Group 1',
+            "group2" : "Group 2",
+            "group3" : "Group 3",
+            "group4" : "Group 4"
+        };
+
+
+        google.load("visualization", "1");
+
+        // Set callback to run when API is loaded
+        google.setOnLoadCallback(drawVisualization);
+
+        // Called when the Visualization API is loaded.
+        function drawVisualization() 
+        {
+            // specify options
+            var options = {
+
+                //set fixed time which cannot be moved left
+                min: new Date(2013,4,1,1,1,1),
+                
+                //default width of the chart ( height is auto )
+                width:  "800px",
+
+                //set if if could be resized
+                resizable: true,
+
+                //set if the items are editable
+                editable: true,
+
+                eventMargin: 5,  // minimal margin between events
+                eventMarginAxis: 0, // minimal margin beteen events and the axis
+                
+                showMajorLabels: false, //show detailed time string in axis
+                axisOnTop: true,  //otherwise the axis will be at bottom
+
+                //showCustomTime: true, // show a blue, draggable bar displaying a custom time    
+                //showCurrentTime: true, // show a red bar displaying the current time
+
+                //the width of group label column ( optional )
+                groupsWidth : "100px",
+
+                //if allow items move across groups
+                groupsChangeable : true,
+
+                //set groups on left or right
+                groupsOnRight: false, // or left
+
+                //the minimum range of zoom in
+                zoomMin: 100, // 100ms
+
+                //the maximum range of zoom out
+                zoomMax: 1000 * 60 * 60 * 24 * 365, // a year
+
+                //show the navigation panel
+                showNavigation: true,
+                showButtonNew: true
+            };
+
+            // Instantiate our timeline object.
+            timeline = new links.Timeline(document.getElementById('mytimeline'));
+
+
+            //prepare data from JSON
+            for(var i=0,r; r = jsonData[i]; i++)
+            {
+                //convert time string to time object
+                jsonData[i].start = links.Timeline.parseJSONDate(r.start);
+                jsonData[i].end = links.Timeline.parseJSONDate(r.end);
+                //change group name string to Styled Text
+                jsonData[i].group = groupText[r.group];
+            }
+
+            // Draw our timeline with the created data and options
+            timeline.draw(jsonData, options);
+
+            //confirm on delete
+            links.events.addListener(timeline,'delete',function()
+            {
+                if (!confirm('Are you sure to delete this item?'))
+                    timeline.cancelDelete();
+                else
+                    ItemsUpdated();
+            });
+            //on change, update json
+            links.events.addListener(timeline,'change',ItemsUpdated);
+        }
+
+
+
+        function ItemsUpdated()
+        {
+            var reverseGroup = {};
+            for(var k in groupText) reverseGroup[ groupText[k] ] = k;
+
+            //copy and convert current data
+            var data = [];
+            for(var i=0,r; r=timeline.data[i]; i++)
+            {
+                data.push(
+                {
+                    start: dateToString(r.start),
+                    end: dateToString(r.end),
+                    content: r.content,
+                    group: reverseGroup[r.group], //convert group text back
+                    type: r.type
+                });
+            }
+            console.log(JSON.stringify(data));
+        }
+
+        function dateToString(t)
+        {
+            if (typeof t == 'number') t = new Date(t);
+            return 'Date('+t.getFullYear()+', '+(t.getMonth()+1)+', '+t.getDate()+', '+t.getHours()+', '+t.getMinutes()+', '+t.getSeconds()+', '+t.getMilliseconds()+')';
+        }
+    </script>
+</head>
+
+<body>
+<h1>Timeline Group Demo</h1>
+
+<div id="mytimeline"></div>
+
+<!-- Information about where the used icons come from -->
+<p style="color:gray; font-size:10px; font-style:italic;">
+    Icons by <a href="http://dryicons.com" target="_blank" title="Aesthetica 2 Icons by DryIcons" style="color:gray;" >DryIcons</a>
+    and <a href="http://www.tpdkdesign.net" target="_blank" title="Refresh Cl Icons by TpdkDesign.net" style="color:gray;" >TpdkDesign.net</a>
+</p>
+<p>
+Sponsored by <a href="http://www.xperiment.mobi" target=_blank>www.xperiment.mobi</a>
+</p>
+
+</body>
+</html>
