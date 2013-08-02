@@ -43,3 +43,9 @@ browser.
 
 Documentation can be found in the directory doc
 Examples can be found in the directory examples
+
+##DEMO##
+
+Please clone this git to your local or web server, then visit examples/index.html.
+
+An online live demo also could be accessed [here](http://htmlpreview.github.io/?https://github.com/longbill/chap-links-timeline/blob/master/examples/index.html)
