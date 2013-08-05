@@ -48,4 +48,9 @@ Examples can be found in the directory examples
 
 Please clone this git to your local or web server, then visit examples/index.html.
 
-An online live demo also could be accessed [here](http://htmlpreview.github.io/?https://github.com/longbill/chap-links-timeline/blob/master/examples/index.html)
+An online live demo also could be accessed [here](http://rawgithub.com/longbill/chap-links-timeline/master/examples/index.html)
+
+
+
+Sponsored by [www.xperiment.mobi](http://www.xperiment.mobi)
+
