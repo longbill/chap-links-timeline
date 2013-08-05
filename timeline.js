@@ -252,6 +252,8 @@ links.Timeline = function(container) {
     // date interval must be initialized 
     this.setVisibleChartRange(undefined, undefined, false);
 
+
+
     // render for the first time
     this.render();
 
@@ -292,6 +294,23 @@ links.Timeline.prototype.draw = function(data, options, isJSON) {
             data[i].end = links.Timeline.parseJSONDate(r.end);
         }
     }
+
+
+    var c = this.options.groupText;
+    if (c)
+    {
+        for(var i=0,r; r = data[i]; i++)
+        {
+            //convert time string to time object
+            data[i].group = c[data[i].group] || data[i].group;
+        }
+    }
+    
+
+
+
+
+
     // read the data
     this.setData(data);
 
@@ -4753,11 +4772,11 @@ links.Timeline.prototype.getGroup = function (groupName) {
  *                              was not provided
  */
 links.Timeline.prototype.getGroupName = function (groupObj) {
-    var c = this.options.groupText;
-    return (c && c[groupObj.content]) ? c[groupObj.content] : groupObj.content;
+    // var c = this.options.groupText;
+    // return (c && c[groupObj.content]) ? c[groupObj.content] : groupObj.content;
     
     
-    //return groupObj ? groupObj.content : undefined;
+    return groupObj ? groupObj.content : undefined;
 };
 
 /**
