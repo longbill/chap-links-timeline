@@ -21,13 +21,13 @@
             "start": "Date(2013, 6, 30, 18, 48, 33, 774)",
             "end": "Date(2013, 6, 30, 22, 48, 33, 774)",
             "content": "",
-            "group": "group1",
+            "group": "group4",
             "type": "range"
         }, {
             "start": "Date(2013, 6, 30, 23, 48, 33, 774)",
             "end": "Date(2013, 6, 31, 1, 48, 33, 774)",
             "content": "",
-            "group": "group2",
+            "group": "group1",
             "type": "range"
         }, {
             "start": "Date(2013, 6, 31, 2, 48, 33, 774)",
@@ -157,7 +157,10 @@
 
                 //show the navigation panel
                 showNavigation: true,
-                showButtonNew: true
+                showButtonNew: true,
+
+                groupText: groupText,
+                sortableGroup : true
             };
 
             // Instantiate our timeline object.
@@ -165,17 +168,15 @@
 
 
             //prepare data from JSON
-            for(var i=0,r; r = jsonData[i]; i++)
-            {
-                //convert time string to time object
-                jsonData[i].start = links.Timeline.parseJSONDate(r.start);
-                jsonData[i].end = links.Timeline.parseJSONDate(r.end);
-                //change group name string to Styled Text
-                jsonData[i].group = groupText[r.group];
-            }
+            // for(var i=0,r; r = jsonData[i]; i++)
+            // {
+            //     //convert time string to time object
+            //     jsonData[i].start = links.Timeline.parseJSONDate(r.start);
+            //     jsonData[i].end = links.Timeline.parseJSONDate(r.end);
+            // }
 
             // Draw our timeline with the created data and options
-            timeline.draw(jsonData, options);
+            timeline.draw(jsonData, options, true);
 
             //confirm on delete
             links.events.addListener(timeline,'delete',function()

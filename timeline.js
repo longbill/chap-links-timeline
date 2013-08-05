@@ -276,13 +276,22 @@ links.Timeline = function(container) {
  * @param {Object} options         A name/value map containing settings for the
  *                                 timeline. Optional.
  */
-links.Timeline.prototype.draw = function(data, options) {
+links.Timeline.prototype.draw = function(data, options, isJSON) {
     this.setOptions(options);
     
     if (this.options.selectable) {
         links.Timeline.addClassName(this.dom.frame, "timeline-selectable");
     }
 
+    if (isJSON)
+    {
+        for(var i=0,r; r = data[i]; i++)
+        {
+            //convert time string to time object
+            data[i].start = links.Timeline.parseJSONDate(r.start);
+            data[i].end = links.Timeline.parseJSONDate(r.end);
+        }
+    }
     // read the data
     this.setData(data);
 
@@ -1843,18 +1852,23 @@ links.Timeline.prototype.repaintGroups = function() {
 
     // append new items when needed
     for (var i = current; i < needed; i++) {
+
         var group = groups[i];
 
         // create text label
         var label = document.createElement("DIV");
         label.className = "timeline-groups-text";
         label.style.position = "absolute";
+        label.title = group.content;
+
         if (options.groupsWidth === undefined) {
             label.style.whiteSpace = "nowrap";
         }
         label.innerHTML = this.getGroupName(group);
         frame.appendChild(label);
         labels[i] = label;
+
+        this.makeGroupSortable(label);
 
         // create the grid line between the group labels
         var labelLine = document.createElement("DIV");
@@ -1952,6 +1966,10 @@ links.Timeline.prototype.repaintGroups = function() {
             links.imageloader.loadAll(imageUrls, callback, sendCallbackWhenAlreadyLoaded);
         }
     }
+
+
+
+
 };
 
 
@@ -2671,6 +2689,8 @@ links.Timeline.prototype.onMouseDown = function(event) {
         var xend = new Date(xstart.valueOf());
         var content = options.NEW;
         var group = this.getGroupFromHeight(y);
+
+
         this.addItem({
             'start': xstart,
             'end': xend,
@@ -4512,9 +4532,21 @@ links.Timeline.prototype.getItem = function (index) {
  * @param {boolean} [preventRender=false]   Do not re-render timeline if true
  */
 links.Timeline.prototype.addItem = function (itemData, preventRender) {
+
+    if (this.options.groupText)
+    {
+        var cache = {};
+        for(var key in this.options.groupText)
+        {
+            cache[ this.options.groupText[key] ] = key;
+        }
+        itemData.group = cache[ itemData.group ];
+    }
+
     var itemsData = [
         itemData
     ];
+
 
     this.addItems(itemsData, preventRender);
 };
@@ -4681,15 +4713,26 @@ links.Timeline.prototype.getGroup = function (groupName) {
         };
         groups.push(groupObj);
         // sort the groups
-        groups = groups.sort(function (a, b) {
-            if (a.content > b.content) {
-                return 1;
-            }
-            if (a.content < b.content) {
-                return -1;
-            }
-            return 0;
-        });
+
+        // groups = groups.sort(function (a, b) {
+        //     if (a.content > b.content) {
+        //         return 1;
+        //     }
+        //     if (a.content < b.content) {
+        //         return -1;
+        //     }
+        //     return 0;
+        // });
+        if (this.hasSortedGroup)
+        {
+            var _labelsTop = this._labelsTop;
+            groups = groups.sort(function(a,b)
+            {
+                if (_labelsTop[a.content] > _labelsTop[b.content]) return 1;
+                if (_labelsTop[a.content] > _labelsTop[b.content]) return -1;
+                return 0;
+            });
+        }
 
         // rebuilt the groupIndexes
         for (var i = 0, iMax = groups.length; i < iMax; i++) {
@@ -4710,7 +4753,11 @@ links.Timeline.prototype.getGroup = function (groupName) {
  *                              was not provided
  */
 links.Timeline.prototype.getGroupName = function (groupObj) {
-    return groupObj ? groupObj.content : undefined;
+    var c = this.options.groupText;
+    return (c && c[groupObj.content]) ? c[groupObj.content] : groupObj.content;
+    
+    
+    //return groupObj ? groupObj.content : undefined;
 };
 
 /**
@@ -6687,8 +6734,61 @@ links.Timeline.prototype.makeResizable = function(dom,handler)
     });
 };
 
+links.Timeline.prototype.makeGroupSortable = function(dom)
+{
+    dom.style.cursor = 'move';
+    var self = this;
+    links.Timeline.addEventListener(dom,'mousedown',function(event)
+    {
+        if (event.button && event.button == 2) return;
+        dom.style.zIndex = 2;
+        links.Timeline.preventDefault(event);
+        links.Timeline.stopPropagation(event);
+
+        var mouseY = links.Timeline.getPageY(event);
+        var startTop = parseInt(dom.style.top);
 
 
+        var mousemove = function(event)
+        {
+            var y = links.Timeline.getPageY(event);
+            var gap = y - mouseY;
+            var newTop = startTop + gap;
+            dom.style.top = newTop+'px';
+        };
+
+        var mouseup = function(event)
+        {
+            dom.style.zIndex = '';
+            links.Timeline.removeEventListener(document,'mousemove',mousemove);
+            links.Timeline.removeEventListener(document,'mouseup',mouseup);
+            self.reorderGroups();
+        };
+        links.Timeline.addEventListener(document,'mousemove',mousemove);
+        links.Timeline.addEventListener(document,'mouseup',mouseup);
+        
+
+    });
+};
+
+links.Timeline.prototype.reorderGroups = function()
+{
+    var labels = this.dom.groups.labels;
+    var groups = this.groups;
+
+    this._labelsTop = {};
+    this.hasSortedGroup = true;
+    for(var i=0;i<labels.length;i++)
+    {
+        this._labelsTop[ labels[i].title ] = parseInt(labels[i].style.top);
+    }
+
+    this.redraw();
+    for(var i=0;i<this.groups.length;i++)
+    {
+        this.dom.groups.labels[i].title = this.groups[i].content;
+    }
+};
 
 
 
